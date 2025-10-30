@@ -1,0 +1,54 @@
+{
+  "task_id": "e10d4cdd-6969-4041-bc9a-b2383dc7eae6",
+  "source": {
+    "filename": "gen.mp4",
+    "filesize": 4708,
+    "duration_sec": 1.0
+  },
+  "ml": {
+    "provider": "local_stub",
+    "score": 0.7,
+    "raw_response": {
+      "type": "stub",
+      "rule": "recompression_high"
+    }
+  },
+  "metadata": {
+    "flags": [
+      "missing_exif",
+      "recompression_detected"
+    ],
+    "details": {
+      "create_time": null,
+      "encoder": "Lavf62.3.100",
+      "recompression_chain": "Lavf62.3.100"
+    }
+  },
+  "prnu": {
+    "clip_score": 0.6040648221969604,
+    "face_region_scores": [],
+    "heatmap_image": null,
+    "residual_images": [
+      "C:\\Users\\Owen Digitals\\Downloads\\Fintech Dashboard Design\\deepforensics\\work\\evidence\\e10d4cdd-6969-4041-bc9a-b2383dc7eae6\\residual_sample.png"
+    ]
+  },
+  "ensemble": {
+    "weighted_score": 0.8099999999999999,
+    "decision": "LIKELY_MANIPULATED",
+    "explanation": "local_stub+PRNU proxy+metadata rules"
+  },
+  "evidence": {
+    "frames": [
+      "C:/Users/OWENDI~1/AppData/Local/Temp/deepforensics_analyze_jv15gdya/frames/frame_0001.png",
+      "C:/Users/OWENDI~1/AppData/Local/Temp/deepforensics_analyze_jv15gdya/frames/frame_0002.png",
+      "C:/Users/OWENDI~1/AppData/Local/Temp/deepforensics_analyze_jv15gdya/frames/frame_0003.png"
+    ],
+    "residuals": [
+      "C:\\Users\\Owen Digitals\\Downloads\\Fintech Dashboard Design\\deepforensics\\work\\evidence\\e10d4cdd-6969-4041-bc9a-b2383dc7eae6\\residual_sample.png"
+    ]
+  },
+  "timestamps": {
+    "started_at": "2025-10-30T14:25:03.600377Z",
+    "finished_at": "2025-10-30T14:25:05.351569Z"
+  }
+}

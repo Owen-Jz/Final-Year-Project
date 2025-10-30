@@ -1,0 +1,264 @@
+{
+  "task_id": "ad385b39-7f17-4aa6-bec5-8a159179a3e5",
+  "source": {
+    "filename": "Untitled video - Made with Clipchamp.mp4",
+    "filesize": 6949911,
+    "duration_sec": 15.233333
+  },
+  "ml": {
+    "provider": "local_stub",
+    "score": 0.85,
+    "raw_response": {
+      "type": "stub",
+      "rule": "face_artifact_very_high"
+    }
+  },
+  "metadata": {
+    "flags": [
+      "missing_exif"
+    ],
+    "details": {
+      "create_time": null,
+      "encoder": "https://clipchamp.com",
+      "recompression_chain": null
+    }
+  },
+  "prnu": {
+    "clip_score": 0.4669479429721832,
+    "face_region_scores": [
+      {
+        "frame_index": 0,
+        "bbox": [
+          200,
+          52,
+          261,
+          261
+        ],
+        "score": 0.9069611108796969
+      },
+      {
+        "frame_index": 1,
+        "bbox": [
+          195,
+          45,
+          269,
+          269
+        ],
+        "score": 0.9123557581454103
+      },
+      {
+        "frame_index": 2,
+        "bbox": [
+          197,
+          51,
+          264,
+          264
+        ],
+        "score": 0.9112354246573933
+      },
+      {
+        "frame_index": 3,
+        "bbox": [
+          200,
+          48,
+          264,
+          264
+        ],
+        "score": 0.9103145865806942
+      },
+      {
+        "frame_index": 3,
+        "bbox": [
+          322,
+          368,
+          106,
+          106
+        ],
+        "score": 0.9247981552491443
+      },
+      {
+        "frame_index": 7,
+        "bbox": [
+          321,
+          364,
+          110,
+          110
+        ],
+        "score": 0.9110325232244219
+      },
+      {
+        "frame_index": 8,
+        "bbox": [
+          349,
+          139,
+          66,
+          66
+        ],
+        "score": 0.9115652027055801
+      },
+      {
+        "frame_index": 8,
+        "bbox": [
+          322,
+          364,
+          113,
+          113
+        ],
+        "score": 0.9093709060323514
+      },
+      {
+        "frame_index": 9,
+        "bbox": [
+          344,
+          140,
+          62,
+          62
+        ],
+        "score": 0.9317368167403489
+      },
+      {
+        "frame_index": 9,
+        "bbox": [
+          322,
+          369,
+          102,
+          102
+        ],
+        "score": 0.921727144751276
+      },
+      {
+        "frame_index": 10,
+        "bbox": [
+          313,
+          370,
+          107,
+          107
+        ],
+        "score": 0.9091058361427192
+      },
+      {
+        "frame_index": 10,
+        "bbox": [
+          198,
+          60,
+          248,
+          248
+        ],
+        "score": 0.9093343373898549
+      },
+      {
+        "frame_index": 11,
+        "bbox": [
+          338,
+          154,
+          62,
+          62
+        ],
+        "score": 0.8914583425271024
+      },
+      {
+        "frame_index": 11,
+        "bbox": [
+          319,
+          374,
+          102,
+          102
+        ],
+        "score": 0.9036290706979441
+      },
+      {
+        "frame_index": 12,
+        "bbox": [
+          187,
+          71,
+          242,
+          242
+        ],
+        "score": 0.9065962570376206
+      },
+      {
+        "frame_index": 12,
+        "bbox": [
+          304,
+          370,
+          107,
+          107
+        ],
+        "score": 0.9032516648981748
+      },
+      {
+        "frame_index": 13,
+        "bbox": [
+          236,
+          119,
+          59,
+          59
+        ],
+        "score": 0.9181443203858747
+      },
+      {
+        "frame_index": 13,
+        "bbox": [
+          306,
+          366,
+          110,
+          110
+        ],
+        "score": 0.9032455388460132
+      },
+      {
+        "frame_index": 20,
+        "bbox": [
+          327,
+          356,
+          140,
+          140
+        ],
+        "score": 0.9092097044566084
+      },
+      {
+        "frame_index": 21,
+        "bbox": [
+          317,
+          361,
+          118,
+          118
+        ],
+        "score": 0.9111818480161054
+      },
+      {
+        "frame_index": 24,
+        "bbox": [
+          319,
+          360,
+          120,
+          120
+        ],
+        "score": 0.9094268890830599
+      }
+    ],
+    "heatmap_image": "C:/Users/Owen Digitals/Downloads/Fintech Dashboard Design/deepforensics/work/evidence/ad385b39-7f17-4aa6-bec5-8a159179a3e5/heatmap_frame_000.png",
+    "residual_images": [
+      "C:\\Users\\Owen Digitals\\Downloads\\Fintech Dashboard Design\\deepforensics\\work\\evidence\\ad385b39-7f17-4aa6-bec5-8a159179a3e5\\residual_sample.png"
+    ]
+  },
+  "ensemble": {
+    "weighted_score": 0.8195210450221047,
+    "decision": "LIKELY_MANIPULATED",
+    "explanation": "local_stub+PRNU proxy+metadata rules"
+  },
+  "evidence": {
+    "frames": [
+      "C:/Users/OWENDI~1/AppData/Local/Temp/deepforensics_analyze_r3lgbgla/frames/frame_0001.png",
+      "C:/Users/OWENDI~1/AppData/Local/Temp/deepforensics_analyze_r3lgbgla/frames/frame_0002.png",
+      "C:/Users/OWENDI~1/AppData/Local/Temp/deepforensics_analyze_r3lgbgla/frames/frame_0003.png"
+    ],
+    "residuals": [
+      "C:\\Users\\Owen Digitals\\Downloads\\Fintech Dashboard Design\\deepforensics\\work\\evidence\\ad385b39-7f17-4aa6-bec5-8a159179a3e5\\residual_sample.png"
+    ]
+  },
+  "timestamps": {
+    "started_at": "2025-10-30T14:43:52.766229Z",
+    "finished_at": "2025-10-30T14:43:57.975011Z"
+  }
+}

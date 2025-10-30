@@ -1,0 +1,11 @@
+opencv-python==4.7.*
+numpy==1.26.*
+scipy==1.11.*
+pywavelets==1.5.*
+fastapi==0.95.*
+uvicorn==0.22.*
+pytest==7.4.*
+python-multipart==0.0.6
+requests==2.31.0
+httpx==0.24.*
+
