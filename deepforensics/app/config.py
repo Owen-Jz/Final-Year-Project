@@ -35,7 +35,7 @@ W_PRNU = 0.3
 W_META = 0.1
 
 # ML provider
-# "stub" (default) or "ollama" (local-only)
+# "stub" or "ollama" (local-only)
 ML_PROVIDER = os.environ.get("DF_ML_PROVIDER", "stub")
 OLLAMA_HOST = os.environ.get("DF_OLLAMA_HOST", "http://127.0.0.1:11434")
 OLLAMA_MODEL = os.environ.get("DF_OLLAMA_MODEL", "llava:7b")

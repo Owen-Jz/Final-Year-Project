@@ -12,6 +12,7 @@
       header h1 { font-size:18px; margin:0; letter-spacing:.3px; }
       .chip { border:1px solid #1f2a44; background:#0c1528; padding:6px 10px; border-radius:999px; font-size:12px; color:var(--muted); }
       main { max-width:1100px; margin:24px auto; padding:0 16px; display:grid; grid-template-columns: 360px 1fr; gap:16px; }
+      @media (max-width: 960px){ main{ grid-template-columns: 1fr; } }
       .card { background:var(--card); border:1px solid #1f2a44; border-radius:12px; padding:16px; }
       .muted { color:var(--muted); font-size:13px; }
       .row { display:flex; gap:12px; align-items:center; }
@@ -28,13 +29,16 @@
       .badge.warn { background:rgba(255,176,32,.12); color:#ffb020; border:1px solid rgba(255,176,32,.3) }
       .badge.bad { background:rgba(255,84,112,.12); color:#ff5470; border:1px solid rgba(255,84,112,.3) }
       .grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-top:10px; }
-      .imgbox { background:#0c1528; border:1px solid #1f2a44; border-radius:10px; padding:8px; text-align:center; }
-      .imgbox img { max-width:100%; border-radius:6px; }
-      .code { background:#0c1528; border:1px solid #1f2a44; border-radius:10px; padding:12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; white-space:pre-wrap; }
+      @media (max-width: 960px){ .grid{ grid-template-columns: 1fr; } }
+      .imgbox { background:#0c1528; border:1px solid #1f2a44; border-radius:10px; padding:8px; text-align:center; min-height:240px; display:flex; align-items:center; justify-content:center; }
+      .imgbox img { max-width:100%; max-height:220px; object-fit:contain; border-radius:6px; }
+      .code { background:#0c1528; border:1px solid #1f2a44; border-radius:10px; padding:12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; white-space:pre; overflow:auto; max-height:320px; }
       .actions { display:flex; gap:8px; }
       #overlay { position:fixed; inset:0; background:rgba(11,18,32,.6); display:none; align-items:center; justify-content:center; z-index:10; }
       .spinner { width:48px; height:48px; border:4px solid #1f2a44; border-top-color:#4f8cff; border-radius:50%; animation:spin 1s linear infinite; }
       @keyframes spin { to { transform: rotate(360deg) } }
+      #heatmap-grid { overflow:auto; max-height:240px; }
+      #meta-badges { display:flex; flex-wrap:wrap; gap:6px; }
     </style>
   </head>
   <body>
@@ -75,6 +79,17 @@
             <div id="confbar" style="height:100%; width:0%; background:linear-gradient(90deg, #19c37d, #ffb020 50%, #ff5470 100%);"></div>
           </div>
         </div>
+        <div style="margin-top:16px; padding:12px; background:#0c1528; border:1px solid #1f2a44; border-radius:10px;">
+          <div class="muted" style="margin-bottom:8px;">AI Explanation</div>
+          <div id="verdict" style="margin-bottom:8px; font-weight:700; font-size:16px; color:var(--accent);"></div>
+          <div id="explanation" style="color:#e6edf3; line-height:1.6; font-size:14px;">—</div>
+          <div id="key-findings" style="margin-top:10px;"></div>
+          <div id="ml-confidence" style="margin-top:8px; font-size:12px; color:var(--muted);"></div>
+        </div>
+        <div style="margin-top:16px; padding:12px; background:#0c1528; border:1px solid #1f2a44; border-radius:10px;">
+          <div class="muted" style="margin-bottom:8px;">Frame-by-Frame Analysis</div>
+          <div id="frame-analysis" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
         <div style="margin-top:10px">
           <span id="meta-badges"></span>
         </div>
@@ -88,10 +103,7 @@
           <div class="muted">Top face-region scores</div>
           <div id="faces" class="code"></div>
         </div>
-        <div style="margin-top:12px">
-          <div class="muted">Full JSON</div>
-          <pre id="report" class="code"></pre>
-        </div>
+        <!-- Full JSON removed from inline view; use Download JSON only -->
       </section>
     </main>
     <div id="overlay"><div class="spinner"></div></div>
