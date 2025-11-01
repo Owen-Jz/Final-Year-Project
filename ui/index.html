@@ -5,108 +5,797 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>DeepForensics Local Demo</title>
     <style>
-      :root { --bg:#0b1220; --card:#121a2b; --muted:#8892a6; --accent:#4f8cff; --ok:#19c37d; --warn:#ffb020; --bad:#ff5470; }
-      *{box-sizing:border-box}
-      body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; margin:0; background:var(--bg); color:#e6edf3; }
-      header { padding:16px 24px; border-bottom:1px solid #1f2a44; display:flex; justify-content:space-between; align-items:center; }
-      header h1 { font-size:18px; margin:0; letter-spacing:.3px; }
-      .chip { border:1px solid #1f2a44; background:#0c1528; padding:6px 10px; border-radius:999px; font-size:12px; color:var(--muted); }
-      main { max-width:1100px; margin:24px auto; padding:0 16px; display:grid; grid-template-columns: 360px 1fr; gap:16px; }
-      @media (max-width: 960px){ main{ grid-template-columns: 1fr; } }
-      .card { background:var(--card); border:1px solid #1f2a44; border-radius:12px; padding:16px; }
-      .muted { color:var(--muted); font-size:13px; }
-      .row { display:flex; gap:12px; align-items:center; }
-      .btn { background:var(--accent); color:white; border:none; padding:10px 14px; border-radius:8px; cursor:pointer; font-weight:600; }
-      .btn:disabled { opacity:.6; cursor:not-allowed }
-      input[type="file"] { width:100%; }
-      label { font-size:14px; }
-      .stats { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-top:8px; }
-      .stat { background:#0c1528; border:1px solid #1f2a44; border-radius:10px; padding:12px; }
-      .stat .k { font-size:12px; color:var(--muted); }
-      .stat .v { font-size:18px; font-weight:700; margin-top:2px; }
-      .badge { display:inline-block; padding:4px 8px; border-radius:999px; font-size:12px; font-weight:600; }
-      .badge.ok { background:rgba(25,195,125,.12); color:#19c37d; border:1px solid rgba(25,195,125,.3) }
-      .badge.warn { background:rgba(255,176,32,.12); color:#ffb020; border:1px solid rgba(255,176,32,.3) }
-      .badge.bad { background:rgba(255,84,112,.12); color:#ff5470; border:1px solid rgba(255,84,112,.3) }
-      .grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-top:10px; }
-      @media (max-width: 960px){ .grid{ grid-template-columns: 1fr; } }
-      .imgbox { background:#0c1528; border:1px solid #1f2a44; border-radius:10px; padding:8px; text-align:center; min-height:240px; display:flex; align-items:center; justify-content:center; }
-      .imgbox img { max-width:100%; max-height:220px; object-fit:contain; border-radius:6px; }
-      .code { background:#0c1528; border:1px solid #1f2a44; border-radius:10px; padding:12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; white-space:pre; overflow:auto; max-height:320px; }
-      .actions { display:flex; gap:8px; }
-      #overlay { position:fixed; inset:0; background:rgba(11,18,32,.6); display:none; align-items:center; justify-content:center; z-index:10; }
-      .spinner { width:48px; height:48px; border:4px solid #1f2a44; border-top-color:#4f8cff; border-radius:50%; animation:spin 1s linear infinite; }
-      @keyframes spin { to { transform: rotate(360deg) } }
-      #heatmap-grid { overflow:auto; max-height:240px; }
-      #meta-badges { display:flex; flex-wrap:wrap; gap:6px; }
+      :root {
+        --color-bg: #050913;
+        --color-bg-accent: radial-gradient(120% 120% at 50% 0%, rgba(79, 140, 255, 0.18) 0%, rgba(5, 9, 19, 0.8) 45%, rgba(5, 9, 19, 1) 100%);
+        --color-surface: rgba(13, 22, 39, 0.92);
+        --color-surface-strong: rgba(16, 26, 46, 0.96);
+        --color-surface-soft: rgba(21, 30, 48, 0.85);
+        --color-border: rgba(111, 142, 196, 0.22);
+        --color-border-strong: rgba(79, 140, 255, 0.4);
+        --color-text: #e9eefc;
+        --color-muted: #8f9bb7;
+        --color-accent: #4f8cff;
+        --color-positive: #19c37d;
+        --color-warning: #ffb020;
+        --color-negative: #ff5470;
+        --radius-lg: 20px;
+        --radius-md: 14px;
+        --radius-sm: 10px;
+        --shadow-soft: 0 16px 40px rgba(5, 10, 24, 0.35);
+        --shadow-elevated: 0 28px 60px rgba(5, 10, 24, 0.45);
+        --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+        font-size: 16px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: var(--font-sans);
+        color: var(--color-text);
+        background: var(--color-bg);
+        background-image: var(--color-bg-accent);
+        line-height: 1.6;
+        display: flex;
+        justify-content: center;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(140% 80% at 10% 15%, rgba(79, 140, 255, 0.14) 0%, transparent 55%),
+          radial-gradient(120% 75% at 85% 0%, rgba(25, 195, 125, 0.1) 0%, transparent 60%);
+        pointer-events: none;
+        z-index: -2;
+      }
+
+      .app-shell {
+        width: min(1180px, 100% - clamp(24px, 6vw, 80px));
+        margin: clamp(32px, 8vw, 72px) auto;
+        display: flex;
+        flex-direction: column;
+        gap: clamp(28px, 6vw, 48px);
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 24px;
+        padding: clamp(18px, 3vw, 26px) clamp(22px, 4vw, 34px);
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-soft);
+        backdrop-filter: blur(12px);
+      }
+
+      .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .brand__title {
+        font-size: clamp(1.1rem, 1.4vw + 0.6rem, 1.6rem);
+        font-weight: 700;
+        letter-spacing: 0.8px;
+      }
+
+      .brand__subtitle {
+        font-size: clamp(0.85rem, 1vw + 0.4rem, 1rem);
+        color: var(--color-muted);
+      }
+
+      .status-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        letter-spacing: 0.4px;
+        border: 1px solid var(--color-border);
+        background: rgba(18, 26, 46, 0.6);
+        color: var(--color-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .chip--accent {
+        border-color: var(--color-border-strong);
+        color: var(--color-accent);
+      }
+
+      .layout {
+        display: grid;
+        gap: clamp(24px, 5vw, 38px);
+        grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+        align-items: start;
+      }
+
+      .panel {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: clamp(24px, 4vw, 32px);
+        padding: clamp(24px, 4vw, 36px);
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--color-border);
+        box-shadow: var(--shadow-soft);
+        backdrop-filter: blur(14px);
+      }
+
+      .panel--results {
+        background: var(--color-surface-strong);
+        box-shadow: var(--shadow-elevated);
+      }
+
+      .panel__header {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .panel__title {
+        margin: 0;
+        font-size: clamp(1.2rem, 1.6vw + 0.8rem, 1.8rem);
+        font-weight: 700;
+      }
+
+      .panel__subtitle {
+        margin: 0;
+        font-size: clamp(0.85rem, 0.9vw + 0.5rem, 1rem);
+        color: var(--color-muted);
+      }
+
+      .panel__footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        padding-top: 18px;
+      }
+
+      .panel__footnote {
+        margin: 0;
+        font-size: 0.8rem;
+        color: var(--color-muted);
+      }
+
+      .form {
+        display: flex;
+        flex-direction: column;
+        gap: clamp(18px, 3vw, 22px);
+      }
+
+      .form__field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .form__field label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+      }
+
+      .input {
+        width: 100%;
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(12, 18, 34, 0.85);
+        color: var(--color-text);
+        padding: 12px 14px;
+        font-size: 0.95rem;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .input:hover,
+      .input:focus {
+        border-color: var(--color-border-strong);
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.12);
+      }
+
+      .input--file {
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .input--file input[type="file"] {
+        width: 100%;
+        padding: 12px 14px;
+        background: none;
+        border: none;
+        color: inherit;
+      }
+
+      .form__options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+
+      .checkbox {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+        color: var(--color-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+
+      .checkbox input {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--color-accent);
+      }
+
+      .form__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .btn {
+        border: none;
+        border-radius: var(--radius-md);
+        padding: 12px 20px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .btn--primary {
+        background: linear-gradient(135deg, rgba(79, 140, 255, 0.95), rgba(79, 140, 255, 0.7));
+        color: #fff;
+        box-shadow: 0 16px 32px rgba(79, 140, 255, 0.28);
+      }
+
+      .btn--primary:not(:disabled):hover {
+        transform: translateY(-1px);
+        box-shadow: 0 18px 34px rgba(79, 140, 255, 0.35);
+      }
+
+      .btn--secondary {
+        background: rgba(15, 24, 42, 0.75);
+        color: var(--color-text);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+      }
+
+      .btn--secondary:not(:disabled):hover {
+        transform: translateY(-1px);
+        border-color: var(--color-border-strong);
+      }
+
+      .form__status {
+        font-size: 0.82rem;
+        color: var(--color-muted);
+        min-height: 1.2rem;
+      }
+
+      .metrics {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      }
+
+      .metric-card {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 16px 18px;
+        background: var(--color-surface-soft);
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .metric-card__label {
+        font-size: 0.78rem;
+        letter-spacing: 0.4px;
+        color: var(--color-muted);
+        text-transform: uppercase;
+      }
+
+      .metric-card__value {
+        font-size: clamp(1.25rem, 1vw + 1rem, 1.6rem);
+        font-weight: 700;
+      }
+
+      .progress {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .progress__label {
+        font-size: 0.85rem;
+        letter-spacing: 0.3px;
+        color: var(--color-muted);
+        text-transform: uppercase;
+      }
+
+      .progress__track {
+        width: 100%;
+        height: 12px;
+        border-radius: 999px;
+        background: rgba(12, 18, 32, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        overflow: hidden;
+      }
+
+      .progress__bar {
+        width: 0%;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--color-positive), var(--color-warning) 50%, var(--color-negative));
+        transition: width 0.4s ease;
+      }
+
+      .card {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: clamp(18px, 3vw, 24px);
+        background: var(--color-surface-soft);
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .card--explanation {
+        background: rgba(17, 29, 50, 0.92);
+        border: 1px solid rgba(79, 140, 255, 0.28);
+      }
+
+      .card__header {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .card__title {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 600;
+      }
+
+      .card__body {
+        margin: 0;
+        font-size: 0.95rem;
+      }
+
+      .card__list ul {
+        margin: 0;
+        padding-left: 18px;
+        display: grid;
+        gap: 6px;
+        color: var(--color-text);
+      }
+
+      .card__meta {
+        font-size: 0.8rem;
+        color: var(--color-muted);
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+      }
+
+      .verdict {
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--color-accent);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+      }
+
+      .badge-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        border: 1px solid transparent;
+      }
+
+      .badge--ok {
+        background: rgba(25, 195, 125, 0.12);
+        border-color: rgba(25, 195, 125, 0.35);
+        color: var(--color-positive);
+      }
+
+      .badge--warn {
+        background: rgba(255, 176, 32, 0.14);
+        border-color: rgba(255, 176, 32, 0.35);
+        color: var(--color-warning);
+      }
+
+      .badge--alert {
+        background: rgba(255, 84, 112, 0.16);
+        border-color: rgba(255, 84, 112, 0.4);
+        color: var(--color-negative);
+      }
+
+      .badge--neutral {
+        background: rgba(143, 155, 183, 0.14);
+        border-color: rgba(143, 155, 183, 0.35);
+        color: var(--color-muted);
+      }
+
+      .panel-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .panel-list.empty {
+        color: var(--color-muted);
+        font-size: 0.88rem;
+      }
+
+      .frame-card {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 16px 18px;
+        border-radius: var(--radius-md);
+        background: rgba(13, 21, 36, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .frame-card__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .frame-card__title {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      .frame-card__assessment {
+        font-size: 0.9rem;
+      }
+
+      .frame-card__artifacts {
+        font-size: 0.8rem;
+        color: var(--color-muted);
+      }
+
+      .image-deck {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .image-tile {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 16px;
+        border-radius: var(--radius-md);
+        background: rgba(12, 20, 36, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .image-tile header {
+        font-size: 0.82rem;
+        color: var(--color-muted);
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+      }
+
+      .image-tile img {
+        width: 100%;
+        height: 200px;
+        object-fit: contain;
+        border-radius: var(--radius-sm);
+        background: rgba(8, 15, 28, 0.6);
+        border: 1px dashed rgba(255, 255, 255, 0.05);
+      }
+
+      .image-grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+
+      .image-grid .image-tile,
+      .image-grid img {
+        height: 160px;
+      }
+
+      .image-tile--compact {
+        padding: 14px;
+        gap: 8px;
+      }
+
+      .image-tile--compact header {
+        font-size: 0.76rem;
+      }
+
+      .image-tile--compact img {
+        height: 140px;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .code-block {
+        margin: 0;
+        font-family: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+        font-size: 0.78rem;
+        background: rgba(8, 15, 28, 0.75);
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 14px;
+        overflow: auto;
+        max-height: 260px;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      #overlay {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(5, 9, 19, 0.72);
+        backdrop-filter: blur(6px);
+        z-index: 20;
+      }
+
+      .overlay__dialog {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        padding: 26px 32px;
+        background: rgba(12, 20, 36, 0.95);
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(79, 140, 255, 0.3);
+        box-shadow: var(--shadow-soft);
+        color: var(--color-text);
+        font-size: 0.95rem;
+        letter-spacing: 0.3px;
+      }
+
+      .spinner {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        border: 4px solid rgba(79, 140, 255, 0.18);
+        border-top-color: var(--color-accent);
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 1100px) {
+        .layout {
+          grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+        }
+      }
+
+      @media (max-width: 980px) {
+        .app-shell {
+          width: min(100%, 940px);
+          margin: clamp(24px, 6vw, 48px) auto;
+        }
+
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .panel--form {
+          order: 2;
+        }
+
+        .panel--results {
+          order: 1;
+        }
+
+        .topbar {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .status-group {
+          justify-content: flex-start;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .app-shell {
+          width: 100%;
+          margin: 18px auto 32px;
+        }
+
+        .panel {
+          padding: clamp(20px, 6vw, 28px);
+        }
+
+        .form__actions {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .image-tile img {
+          height: 160px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
     </style>
   </head>
   <body>
-    <header>
-      <h1>DeepForensics — Local Demo</h1>
-      <div class="row">
-        <span id="provider" class="chip">ML: stub</span>
-        <span id="health" class="chip">health: —</span>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand__title">DeepForensics</span>
+          <span class="brand__subtitle">Local deepfake analysis studio</span>
+        </div>
+        <div class="status-group">
+          <span id="provider" class="chip chip--accent">ML: stub</span>
+          <span id="health" class="chip">health: —</span>
+        </div>
+      </header>
+      <main class="layout">
+        <section class="panel panel--form">
+          <div class="panel__header">
+            <h2 class="panel__title">Run an analysis</h2>
+            <p class="panel__subtitle">Upload a sample to generate forensic scores, visual evidence, and AI-assisted explanations in seconds.</p>
+          </div>
+          <form id="analyze-form" class="form">
+            <div class="form__field">
+              <label for="file">Video file</label>
+              <div class="input input--file">
+                <input type="file" id="file" name="file" accept="video/*" required />
+              </div>
+            </div>
+            <div class="form__field">
+              <label for="device_id">Device ID (optional)</label>
+              <input type="text" id="device_id" placeholder="Link to an enrolled PRNU fingerprint" class="input" />
+            </div>
+            <div class="form__options">
+              <label class="checkbox"><input type="checkbox" id="privacy" name="privacy_mode" checked /><span>Privacy mode</span></label>
+            </div>
+            <div class="form__actions">
+              <button class="btn btn--primary" type="submit" id="analyze-btn">Analyze</button>
+              <button class="btn btn--secondary" type="button" id="download-json" disabled>Download JSON</button>
+            </div>
+            <div id="status" class="form__status">Ready.</div>
+          </form>
+          <div class="panel__footer">
+            <p class="panel__footnote">Your media stays on-device. All computation executes locally through the DeepForensics toolkit.</p>
+          </div>
+        </section>
+        <section class="panel panel--results">
+          <div class="panel__header">
+            <h2 class="panel__title">Analysis results</h2>
+            <p class="panel__subtitle">Scores blend traditional signal processing with modern vision-language reasoning for interpretability.</p>
+          </div>
+          <div class="metrics">
+            <article class="metric-card">
+              <span class="metric-card__label">Decision</span>
+              <span class="metric-card__value" id="decision">—</span>
+            </article>
+            <article class="metric-card">
+              <span class="metric-card__label">Ensemble score</span>
+              <span class="metric-card__value" id="ens">—</span>
+            </article>
+            <article class="metric-card">
+              <span class="metric-card__label">ML score</span>
+              <span class="metric-card__value" id="ml">—</span>
+            </article>
+          </div>
+          <div class="progress">
+            <div class="progress__label">Confidence</div>
+            <div class="progress__track">
+              <div class="progress__bar" id="confbar"></div>
+            </div>
+          </div>
+          <div class="card card--explanation">
+            <div class="card__header">
+              <h3 class="card__title">AI verdict & narrative</h3>
+              <div id="verdict" class="verdict"></div>
+            </div>
+            <p id="explanation" class="card__body">—</p>
+            <div id="key-findings" class="card__list"></div>
+            <div id="ml-confidence" class="card__meta"></div>
+          </div>
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title">Frame insights</h3>
+            </div>
+            <div id="frame-analysis" class="panel-list empty">No frame-level insights yet.</div>
+          </div>
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title">Metadata flags</h3>
+            </div>
+            <div id="meta-badges" class="badge-group"></div>
+          </div>
+          <div class="image-deck">
+            <article class="image-tile">
+              <header>Heatmap</header>
+              <img id="heatmap" alt="PRNU heatmap preview" />
+            </article>
+            <article class="image-tile">
+              <header>Residual</header>
+              <img id="residual" alt="PRNU residual preview" />
+            </article>
+            <article class="image-tile">
+              <header>Frame</header>
+              <img id="frame1" alt="Reference frame preview" />
+            </article>
+          </div>
+          <div id="heatmap-grid" class="image-grid"></div>
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title">Top face-region scores</h3>
+            </div>
+            <pre id="faces" class="code-block">—</pre>
+          </div>
+        </section>
+      </main>
+    </div>
+    <div id="overlay">
+      <div class="overlay__dialog">
+        <div class="spinner"></div>
+        <p>Running models…</p>
       </div>
-    </header>
-    <main>
-      <section class="card">
-        <h3 style="margin:0 0 8px 0;">Analyze a video</h3>
-        <p class="muted">Your file never leaves your machine.</p>
-        <form id="analyze-form" style="display:flex; flex-direction:column; gap:10px;">
-          <input type="file" id="file" name="file" accept="video/*" required />
-          <input type="text" id="device_id" placeholder="Optional device_id for enrolled PRNU" style="width:100%; background:#0c1528; color:#e6edf3; border:1px solid #1f2a44; border-radius:8px; padding:10px;" />
-          <div class="row">
-            <label><input type="checkbox" id="privacy" name="privacy_mode" checked /> privacy_mode</label>
-          </div>
-          <div class="actions">
-            <button class="btn" type="submit" id="analyze-btn">Analyze</button>
-            <button class="btn" type="button" id="download-json" disabled>Download JSON</button>
-          </div>
-          <div id="status" class="muted"></div>
-        </form>
-      </section>
-      <section class="card">
-        <h3 style="margin:0 0 8px 0;">Results</h3>
-        <div class="stats">
-          <div class="stat"><div class="k">Decision</div><div class="v" id="decision">—</div></div>
-          <div class="stat"><div class="k">Ensemble score</div><div class="v" id="ens">—</div></div>
-          <div class="stat"><div class="k">ML score</div><div class="v" id="ml">—</div></div>
-        </div>
-        <div style="margin-top:10px">
-          <div class="muted">Confidence</div>
-          <div style="height:10px; background:#0c1528; border:1px solid #1f2a44; border-radius:999px; overflow:hidden;">
-            <div id="confbar" style="height:100%; width:0%; background:linear-gradient(90deg, #19c37d, #ffb020 50%, #ff5470 100%);"></div>
-          </div>
-        </div>
-        <div style="margin-top:16px; padding:12px; background:#0c1528; border:1px solid #1f2a44; border-radius:10px;">
-          <div class="muted" style="margin-bottom:8px;">AI Explanation</div>
-          <div id="verdict" style="margin-bottom:8px; font-weight:700; font-size:16px; color:var(--accent);"></div>
-          <div id="explanation" style="color:#e6edf3; line-height:1.6; font-size:14px;">—</div>
-          <div id="key-findings" style="margin-top:10px;"></div>
-          <div id="ml-confidence" style="margin-top:8px; font-size:12px; color:var(--muted);"></div>
-        </div>
-        <div style="margin-top:16px; padding:12px; background:#0c1528; border:1px solid #1f2a44; border-radius:10px;">
-          <div class="muted" style="margin-bottom:8px;">Frame-by-Frame Analysis</div>
-          <div id="frame-analysis" style="display:flex; flex-direction:column; gap:10px;"></div>
-        </div>
-        <div style="margin-top:10px">
-          <span id="meta-badges"></span>
-        </div>
-        <div class="grid" style="margin-top:12px;">
-          <div class="imgbox"><div class="muted">Heatmap</div><img id="heatmap" /></div>
-          <div class="imgbox"><div class="muted">Residual</div><img id="residual" /></div>
-          <div class="imgbox"><div class="muted">Frame</div><img id="frame1" /></div>
-        </div>
-        <div class="grid" id="heatmap-grid" style="margin-top:12px; grid-template-columns: repeat(3, 1fr);"></div>
-        <div style="margin-top:12px">
-          <div class="muted">Top face-region scores</div>
-          <div id="faces" class="code"></div>
-        </div>
-        <!-- Full JSON removed from inline view; use Download JSON only -->
-      </section>
-    </main>
-    <div id="overlay"><div class="spinner"></div></div>
+    </div>
     <script src="main.js"></script>
   </body>
   </html>

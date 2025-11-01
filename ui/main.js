@@ -48,12 +48,19 @@ function renderReport(j) {
   // Badges for metadata flags
   const mb = document.getElementById('meta-badges');
   mb.innerHTML = '';
-  (j?.metadata?.flags || []).forEach(f => {
+  const metaFlags = j?.metadata?.flags || [];
+  metaFlags.forEach(f => {
     const span = document.createElement('span');
-    span.className = 'badge warn';
+    span.className = 'badge badge--warn';
     span.textContent = f;
     mb.appendChild(span);
   });
+  if (metaFlags.length === 0) {
+    const span = document.createElement('span');
+    span.className = 'badge badge--neutral';
+    span.textContent = 'No metadata flags detected';
+    mb.appendChild(span);
+  }
 
   // Images
   const heat = j?.prnu?.heatmap_image;
@@ -77,11 +84,11 @@ function renderReport(j) {
   if (verdict) {
     verdictDiv.textContent = `Verdict: ${verdict}`;
     if (verdict.includes('AUTHENTIC')) {
-      verdictDiv.style.color = '#19c37d';
+      verdictDiv.style.setProperty('color', 'var(--color-positive)');
     } else if (verdict.includes('MANIPULATED')) {
-      verdictDiv.style.color = '#ff5470';
+      verdictDiv.style.setProperty('color', 'var(--color-negative)');
     } else {
-      verdictDiv.style.color = '#ffb020';
+      verdictDiv.style.setProperty('color', 'var(--color-warning)');
     }
   } else {
     verdictDiv.textContent = '';
@@ -93,21 +100,23 @@ function renderReport(j) {
   // Frame-by-frame analysis
   const frameAnalysisDiv = document.getElementById('frame-analysis');
   frameAnalysisDiv.innerHTML = '';
+  frameAnalysisDiv.classList.remove('empty');
   const frameAnalysis = rawResp.frame_analysis || [];
   if (frameAnalysis && Array.isArray(frameAnalysis) && frameAnalysis.length > 0) {
     frameAnalysis.forEach((fa, idx) => {
-      const frameCard = document.createElement('div');
-      frameCard.style.padding = '10px'; frameCard.style.background = '#0a0f1a'; frameCard.style.border = '1px solid #1f2a44'; frameCard.style.borderRadius = '8px';
-      
+      const frameCard = document.createElement('article');
+      frameCard.className = 'frame-card';
+
       const header = document.createElement('div');
-      header.style.display = 'flex'; header.style.justifyContent = 'space-between'; header.style.alignItems = 'center'; header.style.marginBottom = '6px';
-      
+      header.className = 'frame-card__header';
+
       const frameTitle = document.createElement('div');
-      frameTitle.style.fontWeight = '600'; frameTitle.textContent = `${fa.frame_label || `Frame ${fa.frame_index || idx}`}`;
+      frameTitle.className = 'frame-card__title';
+      frameTitle.textContent = `${fa.frame_label || `Frame ${fa.frame_index || idx}`}`;
       header.appendChild(frameTitle);
       
       const authBadge = document.createElement('span');
-      authBadge.className = fa.authentic ? 'badge ok' : 'badge bad';
+      authBadge.className = fa.authentic ? 'badge badge--ok' : 'badge badge--alert';
       authBadge.textContent = fa.authentic ? 'AUTHENTIC' : 'MANIPULATED';
       header.appendChild(authBadge);
       
@@ -115,14 +124,14 @@ function renderReport(j) {
       
       if (fa.assessment) {
         const assessment = document.createElement('div');
-        assessment.style.color = '#e6edf3'; assessment.style.fontSize = '13px'; assessment.style.marginBottom = '6px';
+        assessment.className = 'frame-card__assessment';
         assessment.textContent = fa.assessment;
         frameCard.appendChild(assessment);
       }
       
       if (fa.visual_artifacts && Array.isArray(fa.visual_artifacts) && fa.visual_artifacts.length > 0) {
         const artifactsDiv = document.createElement('div');
-        artifactsDiv.style.fontSize = '12px'; artifactsDiv.style.color = 'var(--muted)';
+        artifactsDiv.className = 'frame-card__artifacts';
         artifactsDiv.innerHTML = '<strong>Artifacts:</strong> ' + fa.visual_artifacts.join(', ');
         frameCard.appendChild(artifactsDiv);
       }
@@ -130,8 +139,8 @@ function renderReport(j) {
       frameAnalysisDiv.appendChild(frameCard);
     });
   } else {
-    frameAnalysisDiv.textContent = '—';
-    frameAnalysisDiv.style.color = 'var(--muted)';
+    frameAnalysisDiv.textContent = 'No frame-level insights available.';
+    frameAnalysisDiv.classList.add('empty');
   }
   
   // Key findings
@@ -140,13 +149,14 @@ function renderReport(j) {
   const keyFindings = rawResp.key_findings;
   if (keyFindings && Array.isArray(keyFindings) && keyFindings.length > 0) {
     const ul = document.createElement('ul');
-    ul.style.margin = '8px 0 0 0'; ul.style.paddingLeft = '20px'; ul.style.color = '#e6edf3'; ul.style.fontSize = '13px';
     keyFindings.forEach(f => {
       const li = document.createElement('li');
       li.textContent = f;
       ul.appendChild(li);
     });
     kfDiv.appendChild(ul);
+  } else {
+    kfDiv.textContent = 'No key findings were highlighted.';
   }
   
   // ML Confidence
@@ -161,10 +171,24 @@ function renderReport(j) {
   // Heatmap grid (up to 3)
   const hg = document.getElementById('heatmap-grid');
   hg.innerHTML = '';
-  (j?.prnu?.heatmap_images || []).slice(0,3).forEach(src => {
-    const d = document.createElement('div'); d.className = 'imgbox';
-    const i = document.createElement('img'); i.src = src; d.appendChild(i); hg.appendChild(d);
-  });
+  const heatmaps = (j?.prnu?.heatmap_images || []).slice(0, 3);
+  if (heatmaps.length > 0) {
+    hg.classList.remove('hidden');
+    heatmaps.forEach((src, index) => {
+      const tile = document.createElement('article');
+      tile.className = 'image-tile image-tile--compact';
+      const header = document.createElement('header');
+      header.textContent = `Heatmap ${index + 1}`;
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = `Heatmap ${index + 1}`;
+      tile.appendChild(header);
+      tile.appendChild(img);
+      hg.appendChild(tile);
+    });
+  } else {
+    hg.classList.add('hidden');
+  }
 
   // Faces table (top 5 by score)
   const faces = (j?.prnu?.face_region_scores || []).slice().sort((a,b)=>b.score-a.score).slice(0,5);
